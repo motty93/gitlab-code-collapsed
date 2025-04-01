@@ -1,0 +1,22 @@
+{
+  "name": "gitlab-code-collapsed",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build:js": "bun build ./src/content.js --outdir ./dist --target browser",
+    "copy:static": "cp manifest.json dist/manifest.json && cp src/style.css dist/style.css && cp -r icons dist/icons",
+    "build": "bun run clean && mkdir dist && bun run build:js && bun run copy:static",
+    "dev": "bun run build && bun run watch",
+    "watch:js": "bun build ./src/content.js --outdir ./dist --target browser --watch",
+    "watch:static": "bunx onchange 'manifest.json' 'src/style.css' 'icons/**/*' -- bun run copy:static"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "bun-types": "latest",
+    "@biomejs/biome": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,36 @@
+/* コードブロックのラッパー要素 (ボタンの位置基準のため、必要に応じて調整) */
+.blob-viewer[data-type='rich'],
+.file-holder .md,
+.md-preview-holder,
+.wiki .md {
+  position: relative; /* ボタンを内部に配置する場合に基準となる */
+}
+
+/* 折りたたみボタンのスタイル */
+.js-toggle-collapse-button {
+  /* GitLabの既存クリップボードボタンのスタイルに依存 */
+  /* 隣のクリップボードボタンとの間に少しマージンを追加 */
+  margin-right: var(
+    --gl-spacing-scale-2,
+    4px
+  ); /* GitLabのスペーシング変数を使うか、固定値 */
+  /* アイコンの色などは既存のボタンスタイルに従う想定 */
+}
+
+/* ホバー時の表示/非表示は、通常、親要素のスタイルで制御される */
+/* 例: .code-block-header:hover .js-copy-to-clipboard-button,
+      .code-block-header:hover .js-toggle-collapse-button { opacity: 1; } */
+
+/* 折りたたまれた状態のコードブロック本体 */
+/* content.jsのCOLLAPSIBLE_BLOCK_CLASSとCOLLAPSED_CLASS */
+.collapsible-code-block.code-collapsed {
+  max-height: 10em; /* 折りたたんだ時の最大の高さ (約5-6行分程度、調整可) */
+  overflow: hidden;
+  /* 折りたたまれていることを示す視覚的なヒント (任意) */
+  border-bottom: 1px dashed var(--gl-border-color, #e0e0e0);
+}
+
+/* 折りたたまれたコードブロックの直後の要素とのスペース調整 (任意) */
+.collapsible-code-block.code-collapsed + * {
+  /* margin-top: 0.5em; */
+}
