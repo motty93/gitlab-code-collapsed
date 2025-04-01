@@ -1,9 +1,7 @@
-const CODE_BLOCK_WRAPPER_SELECTOR =
-  '.blob-viewer[data-type="rich"], .file-holder .md, .md-preview-holder, .wiki .md';
+const CODE_BLOCK_WRAPPER_SELECTOR = '.markdown-code-block';
 const CODE_BLOCK_SELECTOR = 'pre.code, pre > code';
-const CODE_HEADER_SELECTOR = '.file-header, .js-file-title, .code-block-header';
 const CLIPBOARD_BUTTON_SELECTOR =
-  '.js-copy-to-clipboard-button, [data-testid="copy-button"]';
+  'button.gl-button.btn-icon[data-clipboard-target]';
 const COLLAPSE_BUTTON_CLASS = 'js-toggle-collapse-button';
 const COLLAPSE_ICON_CLASS = 'gl-button-icon';
 const PROCESSED_MARKER_CLASS = 'code-collapser-processed';
@@ -43,39 +41,25 @@ function addCollapseButtons(targetNode) {
   if (wrappers.length === 0) return;
 
   for (const wrapper of wrappers) {
+    if (wrapper.classList.contains(PROCESSED_MARKER_CLASS)) continue;
+
     const codeBlock = wrapper.querySelector(CODE_BLOCK_SELECTOR);
-    let header = wrapper.querySelector(CODE_HEADER_SELECTOR);
-
-    if (!header && codeBlock) {
-      const potentialHeader = codeBlock.closest('div');
-      if (potentialHeader?.querySelector(CLIPBOARD_BUTTON_SELECTOR)) {
-        header = potentialHeader;
-      }
-    }
-
-    if (!codeBlock || !header) continue;
-
-    const existingClipboardButton = header.querySelector(
+    const existingClipboardButton = wrapper.querySelector(
       CLIPBOARD_BUTTON_SELECTOR,
     );
 
-    if (
-      header.classList.contains(PROCESSED_MARKER_CLASS) ||
-      !existingClipboardButton
-    ) {
-      continue;
-    }
+    if (!codeBlock || !existingClipboardButton) continue;
 
     const collapseButton = document.createElement('button');
     collapseButton.type = 'button';
     collapseButton.className = existingClipboardButton.className;
     collapseButton.classList.add(COLLAPSE_BUTTON_CLASS);
 
-    const initialLabel = 'コードを折りたたむ';
+    const initialLabel = 'コードを展開する';
     collapseButton.setAttribute('aria-label', initialLabel);
     collapseButton.setAttribute('title', initialLabel);
 
-    const collapseIcon = createIcon(ICON_DATA_COLLAPSE);
+    const collapseIcon = createIcon(ICON_DATA_EXPAND);
     collapseButton.appendChild(collapseIcon);
 
     collapseButton.addEventListener('click', (event) => {
@@ -94,8 +78,9 @@ function addCollapseButtons(targetNode) {
       collapseButton,
       existingClipboardButton,
     );
-    header.classList.add(PROCESSED_MARKER_CLASS);
+    wrapper.classList.add(PROCESSED_MARKER_CLASS);
     codeBlock.classList.add(COLLAPSIBLE_BLOCK_CLASS);
+    codeBlock.classList.add(COLLAPSED_CLASS);
   }
 }
 
@@ -106,7 +91,12 @@ const observer = new MutationObserver((mutationsList) => {
     for (const node of mutation.addedNodes) {
       if (node.nodeType !== Node.ELEMENT_NODE) continue;
 
-      addCollapseButtons(node);
+      if (
+        node.matches(CODE_BLOCK_WRAPPER_SELECTOR) ||
+        node.querySelector(CODE_BLOCK_WRAPPER_SELECTOR)
+      ) {
+        addCollapseButtons(node);
+      }
     }
   }
 });
